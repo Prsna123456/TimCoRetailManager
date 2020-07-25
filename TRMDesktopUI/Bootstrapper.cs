@@ -8,34 +8,45 @@ using System.Threading.Tasks;
 using System.Windows;
 using TRMDesktopUI.ViewModels;
 using System.Runtime;
+using System.Windows.Controls;
+using TRMDesktopUI.Helpers;
 
 namespace TRMDesktopUI
 {
   public class Bootstrapper : BootstrapperBase
   {
-    private SimpleContainer _container;
+    private SimpleContainer _container = new SimpleContainer();
     public Bootstrapper()
     {
       Initialize();
+
+      ConventionManager.AddElementConvention<PasswordBox>(
+            PasswordBoxHelper.BoundPasswordProperty,
+            "Password",
+            "PasswordChanged");
     }
 
     protected override void Configure()
     {
-      _container = new SimpleContainer();
 
-      //_container.Instance(_container);
-      _container
-        .PerRequest<ShellViewModel>();
+      _container.Instance(_container);
+
+      //_container
+      //  .PerRequest<ShellViewModel>();
+
+      //_container
+      //  .PerRequest<LoginViewModel>();
 
       _container
         .Singleton<IWindowManager, WindowManager>()
-        .Singleton<IEventAggregator, EventAggregator>();
+        .Singleton<IEventAggregator, EventAggregator>()
+        .Singleton<IAPIHelper, APIHelper>();
 
       GetType().Assembly.GetTypes()
         .Where(type => type.IsClass)
         .Where(type => type.Name.EndsWith("ViewModel"))
         .ToList()
-        .ForEach(viewModelType => _container.RegisterInstance(
+        .ForEach(viewModelType => _container.RegisterPerRequest(
           viewModelType, viewModelType.ToString(), viewModelType));
     }
 
