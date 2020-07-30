@@ -13,8 +13,8 @@ namespace TRMDesktopUI.ViewModels
   public class SalesViewModel : Screen
   {
     private BindingList<ProductModel> _products;
-    private BindingList<ProductModel> _cart;
-    private int _itemquantity;
+    private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+    private int _itemquantity = 1;
 
     IProductEndpoint _productEndpoint;
 
@@ -35,6 +35,19 @@ namespace TRMDesktopUI.ViewModels
       Products = new BindingList<ProductModel>(productList);
     }
 
+    private ProductModel _selectedProduct;
+    public ProductModel SelectedProduct
+    {
+      get { return _selectedProduct; }
+      set 
+      { 
+        _selectedProduct = value;
+        NotifyOfPropertyChange(() => SelectedProduct);
+        NotifyOfPropertyChange(() => CanAddToCart);
+      }
+    }
+
+
     public BindingList<ProductModel> Products
     {
       get { return _products; }
@@ -46,7 +59,7 @@ namespace TRMDesktopUI.ViewModels
     }
 
 
-    public BindingList<ProductModel> Cart
+    public BindingList<CartItemModel> Cart
     {
       get { return _cart; }
       set 
@@ -64,15 +77,22 @@ namespace TRMDesktopUI.ViewModels
       {
         _itemquantity = value;
         NotifyOfPropertyChange(() => ItemQuantity);
+        NotifyOfPropertyChange(() => CanAddToCart);
       }
     }
 
     public string SubTotal
     {
       get 
-      { 
-        //TODO - Replace with calculation
-        return "$0.00";
+      {
+        decimal subTotal = 0;
+
+        foreach (var item in Cart)
+        {
+          subTotal += item.Product.RetailPrice * item.QuantityInCart;
+        }
+
+        return subTotal.ToString("C");
       }
     }
 
@@ -102,18 +122,40 @@ namespace TRMDesktopUI.ViewModels
         bool output = false;
 
         //Something is selected
-
-        //if (UserName?.Length > 0 && Password?.Length > 0)
-        //{
-        //  output = true;
-        //}
+        if (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity)
+        {
+          output = true;
+        }
         return output;
       }
     }
 
     public void AddToCart()
     {
+      CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
+      if (existingItem != null)
+      {
+        existingItem.QuantityInCart += ItemQuantity;
+        //NotifyOfPropertyChange(() => existingItem);
+        //var i = existingItem.DisplayText;
+        Cart.Remove(existingItem);
+        Cart.Add(existingItem);
+      }
+      else
+      {
+        CartItemModel item = new CartItemModel()
+        {
+          Product = SelectedProduct,
+          QuantityInCart = ItemQuantity
+        };
+        Cart.Add(item);
+      }
+      
+      SelectedProduct.QuantityInStock -= ItemQuantity;
+      ItemQuantity = 1;
+      NotifyOfPropertyChange(() => SubTotal);
+      //NotifyOfPropertyChange(() => Cart);
     }
 
     public bool CanRemoveFromCart
@@ -134,7 +176,7 @@ namespace TRMDesktopUI.ViewModels
 
     public void RemoveFromCart()
     {
-
+      NotifyOfPropertyChange(() => SubTotal);
     }
 
     public bool CanCheckOut
@@ -149,6 +191,7 @@ namespace TRMDesktopUI.ViewModels
         //{
         //  output = true;
         //}
+
         return output;
       }
     }
