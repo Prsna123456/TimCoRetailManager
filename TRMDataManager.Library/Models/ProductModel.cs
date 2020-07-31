@@ -20,5 +20,6 @@ namespace TRMDataManager.Library.Models
 
     public int QuantityInStock { get; set; }
 
+    public bool IsTaxable { get; set; }
   }
 }
