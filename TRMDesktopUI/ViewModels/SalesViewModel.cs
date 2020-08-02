@@ -19,11 +19,13 @@ namespace TRMDesktopUI.ViewModels
 
     IConfigHelper _configHelper;
     IProductEndpoint _productEndpoint;
+    ISaleEndpoint _saleEndpoint;
 
-    public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+    public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
     {
       _productEndpoint = productEndpoint;
       _configHelper = configHelper;
+      _saleEndpoint = saleEndpoint;
     }
 
     protected override async void OnViewLoaded(object view)
@@ -183,6 +185,7 @@ namespace TRMDesktopUI.ViewModels
       NotifyOfPropertyChange(() => SubTotal);
       NotifyOfPropertyChange(() => Tax);
       NotifyOfPropertyChange(() => Total);
+      NotifyOfPropertyChange(() => CanCheckOut);
       //NotifyOfPropertyChange(() => Cart);
     }
 
@@ -207,6 +210,7 @@ namespace TRMDesktopUI.ViewModels
       NotifyOfPropertyChange(() => SubTotal);
       NotifyOfPropertyChange(() => Tax);
       NotifyOfPropertyChange(() => Total);
+      NotifyOfPropertyChange(() => CanCheckOut);
     }
 
     public bool CanCheckOut
@@ -216,20 +220,30 @@ namespace TRMDesktopUI.ViewModels
         bool output = false;
 
         //Something is selected
-
-        //if (UserName?.Length > 0 && Password?.Length > 0)
-        //{
-        //  output = true;
-        //}
+        if (Cart.Count > 0)
+        {
+          output = true;
+        }
 
         return output;
       }
     }
 
-    public void CheckOut()
+    public async Task CheckOutAsync()
     {
+      //Create a SaleModel and post to api
+      SaleModel sale = new SaleModel();
 
+      foreach (var item in Cart)
+      {
+        sale.SaleDetails.Add(new SaleDetailModel
+        {
+          ProductId = item.Product.Id,
+          Quantity = item.QuantityInCart
+        });
+      }
+
+      await _saleEndpoint.PostSale(sale);
     }
-
   }
 }
