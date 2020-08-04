@@ -219,12 +219,6 @@ namespace TRMDesktopUI.ViewModels
           output = true;
         }
 
-        //Something is selected
-
-        //if (UserName?.Length > 0 && Password?.Length > 0)
-        //{
-        //  output = true;
-        //}
         return output;
       }
     }
