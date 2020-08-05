@@ -62,6 +62,11 @@ namespace TRMDesktopUI.Library.Api
       }
     }
 
+    public void LogoffUser()
+    {
+      _apiClient.DefaultRequestHeaders.Clear();
+    }
+
     public async Task GetLoggedInUserInfo(string token)
     {
       _apiClient.DefaultRequestHeaders.Clear();

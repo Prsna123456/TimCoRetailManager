@@ -10,5 +10,7 @@ namespace TRMDesktopUI.Library.Api
     Task<AuthenticatedUser> Authenticate(string username, string password);
 
     Task GetLoggedInUserInfo(string token);
+
+    void LogoffUser();
   }
 }
