@@ -19,6 +19,5 @@ namespace TRMDataManager.Controllers
 
       return data.GetProducts();
     }
-
   }
 }
