@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-  internal class SqlDataAccess : IDisposable
+  public class SqlDataAccess : IDisposable, ISqlDataAccess
   {
+    private readonly IConfiguration _config;
     public SqlDataAccess(IConfiguration config)
     {
       _config = config;
@@ -85,7 +86,6 @@ namespace TRMDataManager.Library.Internal.DataAccess
     }
 
     private bool isClosed = false;
-    private readonly IConfiguration _config;
 
     public void Committransaction()
     {

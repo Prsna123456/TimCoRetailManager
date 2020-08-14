@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -9,7 +10,19 @@ namespace TRMDataManager.Library
 {
   public class ConfigHelper
   {
+    private readonly IConfiguration _config;
+
     //TODO: Move this from config to API
+    public ConfigHelper(IConfiguration config)
+    {
+      _config = config;
+    }
+
+    public string GetConnectionString(string name)
+    {
+      return _config.GetConnectionString(name);
+      //return ConfigurationManager.ConnectionStrings[name].ConnectionString;
+    }
     public static decimal GetTaxRate()
     {
       string rateText = ConfigurationManager.AppSettings["taxRate"];
