@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using TRMDesktopUI.EventModels;
@@ -26,9 +27,9 @@ namespace TRMDesktopUI.ViewModels
       _apiHelper = apiHelper;
 
 
-      _events.Subscribe(this);
-      
-      ActivateItem(IoC.Get<LoginViewModel>());
+      _events.SubscribeOnPublishedThread(this);
+
+      ActivateItemAsync(IoC.Get<LoginViewModel>());
     }
 
     public bool IsLoggedIn
@@ -48,26 +49,32 @@ namespace TRMDesktopUI.ViewModels
 
     public void ExitApplication()
     {
-      TryClose();
+      TryCloseAsync();
     }
 
-    public void UserManagement()
+    public async void UserManagement()
     {
-      ActivateItem(IoC.Get<UserDisplayViewModel>());
+      await ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
     }
 
-    public void LogOut()
+    public async void LogOut()
     {
       _user.ResetUserModel();
       _apiHelper.LogoffUser();
-      ActivateItem(IoC.Get<LoginViewModel>());
+      await ActivateItemAsync(IoC.Get<LoginViewModel>());
       NotifyOfPropertyChange(() => IsLoggedIn);
     }
 
-    public void Handle(LogOnEvent message)
+    //public void Handle(LogOnEvent message)
+    //{
+    //  //throw new NotImplementedException();
+    //  ActivateItem(_salesVM);
+    //  NotifyOfPropertyChange(() => IsLoggedIn);
+    //}
+
+    public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
     {
-      //throw new NotImplementedException();
-      ActivateItem(_salesVM);
+      await ActivateItemAsync(_salesVM, cancellationToken);
       NotifyOfPropertyChange(() => IsLoggedIn);
     }
   }
