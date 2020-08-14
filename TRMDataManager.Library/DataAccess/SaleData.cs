@@ -12,14 +12,14 @@ namespace TRMDataManager.Library.DataAccess
 {
   public class SaleData : ISaleData
   {
-    //private readonly IConfiguration _config;
+    private readonly IConfiguration _config;
     private readonly IProductData _productData;
     private readonly ISqlDataAccess _sqlDataAccess;
 
     public SaleData(IConfiguration config, IProductData productData,
       ISqlDataAccess sqlDataAccess)
     {
-      //_config = config;
+      _config = config;
       _productData = productData;
       _sqlDataAccess = sqlDataAccess;
     }
@@ -29,8 +29,9 @@ namespace TRMDataManager.Library.DataAccess
 
       List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
       //ProductData products = new ProductData(_config);
+      var configHelper = new ConfigHelper(_config);
 
-      var taxRate = ConfigHelper.GetTaxRate() / 100;
+      var taxRate = configHelper.GetTaxRate() / 100;
 
       foreach (var item in saleInfo.SaleDetails)
       {

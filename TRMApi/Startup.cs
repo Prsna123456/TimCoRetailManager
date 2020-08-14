@@ -42,6 +42,8 @@ namespace TRMApi
       services.AddControllersWithViews();
       services.AddRazorPages();
 
+      //services.AddSingleton(Configuration.GetSection("TaxRate"));
+
       //Personal srvices
       services.AddTransient<IInventoryData, InventoryData>();
       services.AddTransient<ISqlDataAccess, SqlDataAccess>();

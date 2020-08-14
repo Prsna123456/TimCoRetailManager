@@ -10,22 +10,17 @@ namespace TRMDataManager.Library
 {
   public class ConfigHelper
   {
-    private readonly IConfiguration _config;
+    private IConfiguration _config;
 
     //TODO: Move this from config to API
     public ConfigHelper(IConfiguration config)
     {
       _config = config;
     }
-
-    public string GetConnectionString(string name)
+    public decimal GetTaxRate()
     {
-      return _config.GetConnectionString(name);
-      //return ConfigurationManager.ConnectionStrings[name].ConnectionString;
-    }
-    public static decimal GetTaxRate()
-    {
-      string rateText = ConfigurationManager.AppSettings["taxRate"];
+      //string rateText = ConfigurationManager.AppSettings["taxRate"];
+      string rateText = _config.GetSection("TaxRate").GetSection("TaxRateKey").Value;
 
       bool IsValidRate = Decimal.TryParse(rateText, out decimal output);
 
